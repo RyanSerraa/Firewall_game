@@ -1,9 +1,18 @@
 import pygame
 import sys
+import os
 
 # Estados do jogo
 MENU = 'menu'
 PLAYING = 'playing'
+
+# Função para compatibilidade com PyInstaller
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS  # quando empacotado
+    except AttributeError:
+        base_path = os.path.abspath(".")  # modo normal
+    return os.path.join(base_path, relative_path)
 
 def draw_world_map(screen, width, height, mapa_img):
     screen.blit(mapa_img, (0, 0))
@@ -41,7 +50,8 @@ def main():
     game_state = MENU
 
     # Carrega e redimensiona imagem
-    mapa_img = pygame.image.load("Mapa -mundi.png")
+    mapa_path = resource_path("mapaMundi.png")
+    mapa_img = pygame.image.load(mapa_path)
     mapa_img = pygame.transform.scale(mapa_img, (WIDTH, HEIGHT))
 
     clock = pygame.time.Clock()

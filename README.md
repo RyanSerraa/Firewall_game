@@ -10,3 +10,6 @@ Ativar no windowns:
 Activate no .venv\Scripts\activate
 
 Linux: source .venv/bin/activate
+
+Gerar o exe do Jpgo: pyinstaller --onefile --windowed --add-data="mapaMundi.png:." main.py
+
