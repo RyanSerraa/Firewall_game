@@ -39,7 +39,7 @@ def main():
     btn_w, btn_h = 300, 60
     spacing = 20
     total_h = len(buttons) * btn_h + (len(buttons) - 1) * spacing
-    start_y = (HEIGHT - total_h) // 2
+    start_y = (HEIGHT - total_h) // 2 + 50  # espaço para o título
 
     for i, text in enumerate(buttons):
         x = (WIDTH - btn_w) // 2
@@ -82,6 +82,12 @@ def main():
                 g = int(COLOR_BG_TOP[1] * (1 - t) + COLOR_BG_BOTTOM[1] * t)
                 b = int(COLOR_BG_TOP[2] * (1 - t) + COLOR_BG_BOTTOM[2] * t)
                 pygame.draw.line(screen, (r, g, b), (0, i), (WIDTH, i))
+
+            # Desenha o título no topo da tela
+            title_font = pygame.font.Font(None, 72)
+            title_text = title_font.render("FIREWALL GAME", True, COLOR_TEXT)
+            title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+            screen.blit(title_text, title_rect)
 
             mx, my = pygame.mouse.get_pos()
             for rect, text in button_rects:
