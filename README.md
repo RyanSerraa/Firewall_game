@@ -14,8 +14,8 @@
 
 ## Comandos antes do commit
 
-black .
-flake8
+- black .
+- flake8
 
 ## Scrum e Kanban
 
