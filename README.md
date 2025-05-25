@@ -1,18 +1,21 @@
 # Firewall_game
 
-Para baixar a blibioteca --> pip install pygame
+## Configuração
 
-Criar ambiente virtual no windonws: python -m venv .venv
+- Criar ambiente virtual no windonws: python -m venv .venv
+- Criar ambiente virtual no linux: python3 -m venv .venv
 
-Criar ambiente virtual no linux: python3 -m venv .venv
+- Ativar no windowns: .venv\Scripts\activate
+- Ativar no Linux: .venv/bin/activate
 
-Ativar no windowns:
-Activate no .venv\Scripts\activate
+- baixar as dependências: pip install -r requirements.txt
+- Gerar o exe do Jogo: pyinstaller --onefile --windowed --add-data="mapaMundi.png:." main.py
+- Se baixar alguma lib que não esteja no requirements.txt, rode "pip freeze > requirements.txt" para atualizar o requirements.txt
 
-Linux: source .venv/bin/activate
-Baixar lib para gerar exe 
-pip install pyinstaller
-Gerar o exe do Jogo: pyinstaller --onefile --windowed --add-data="mapaMundi.png:." main.py
+## Comandos antes do commit
+
+black .
+flake8
 
 ## Scrum e Kanban
 
