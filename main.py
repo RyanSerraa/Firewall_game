@@ -22,7 +22,7 @@ def main():
 
     WIDTH, HEIGHT = 800, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("FIREWALL - Menu Principal")
+    pygame.display.set_caption("Menu Principal")
 
     # Cores
     COLOR_BG_TOP = (30, 0, 60)
