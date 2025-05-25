@@ -3,8 +3,9 @@ import sys
 import os
 
 # Estados do jogo
-MENU = 'menu'
-PLAYING = 'playing'
+MENU = "menu"
+PLAYING = "playing"
+
 
 # Função para compatibilidade com PyInstaller
 def resource_path(relative_path):
@@ -14,8 +15,10 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")  # modo normal
     return os.path.join(base_path, relative_path)
 
+
 def draw_world_map(screen, width, height, mapa_img):
     screen.blit(mapa_img, (0, 0))
+
 
 def main():
     pygame.init()
@@ -115,5 +118,6 @@ def main():
     pygame.quit()
     sys.exit()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
