@@ -16,10 +16,11 @@ PLAYING = "playing"
 # ------------------------------------------------------------
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-COLOR_BG_TOP     = (30, 0, 60)
-COLOR_BG_BOTTOM  = (90, 0, 150)
-COLOR_PRIMARY    = (128, 0, 255)
-COLOR_HIGHLIGHT  = (255, 0, 255)
+COLOR_BG_TOP = (30, 0, 60)
+COLOR_BG_BOTTOM = (90, 0, 150)
+COLOR_PRIMARY = (128, 0, 255)
+COLOR_HIGHLIGHT = (255, 0, 255)
+
 
 # ------------------------------------------------------------
 # FUNÇÃO PARA CARREGAMENTO DE RECURSOS COM PyInstaller
@@ -31,25 +32,26 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
+
 # ------------------------------------------------------------
 # DADOS DOS PAÍSES (COORDENADAS PARA DESENHO NO MAPA)
 # ------------------------------------------------------------
 countries = {
     "Nova York": (200, 150),
-    "Londres":    (400, 120),
-    "Tóquio":     (650, 180),
-    "São Paulo":  (300, 400),
-    "Joanesburgo":(500, 450),
-    "Berlim":      (420, 130),
-    "Moscou":      (550, 100),
-    "Pequim":      (700, 140),
-    "Sydney":      (750, 500),
-    "Cairo":       (480, 200),
-    "Toronto":     (180, 100),
-    "Paris":       (380, 110),
-    "Seul":        (680, 160),
-    "Buenos Aires":(320, 450),
-    "Mumbai":      (600, 250)
+    "Londres": (400, 120),
+    "Tóquio": (650, 180),
+    "São Paulo": (300, 400),
+    "Joanesburgo": (500, 450),
+    "Berlim": (420, 130),
+    "Moscou": (550, 100),
+    "Pequim": (700, 140),
+    "Sydney": (750, 500),
+    "Cairo": (480, 200),
+    "Toronto": (180, 100),
+    "Paris": (380, 110),
+    "Seul": (680, 160),
+    "Buenos Aires": (320, 450),
+    "Mumbai": (600, 250),
 }
 
 # Inicialmente, todos os níveis de infecção são zero, apenas para colorir os marcadores
@@ -59,19 +61,11 @@ infection_levels = {country: 0 for country in countries}
 # PERFIS DE JOGADOR (utilizados apenas para seleção, sem lógica posterior)
 # ------------------------------------------------------------
 player_profiles = {
-    "Analista": {
-        "base_treatment_power": 2,
-        "treatment_accuracy": 0.7
-    },
-    "Especialista": {
-        "base_treatment_power": 3,
-        "treatment_accuracy": 0.5
-    },
-    "Hacker Ético": {
-        "base_treatment_power": 1,
-        "treatment_accuracy": 0.9
-    }
+    "Analista": {"base_treatment_power": 2, "treatment_accuracy": 0.7},
+    "Especialista": {"base_treatment_power": 3, "treatment_accuracy": 0.5},
+    "Hacker Ético": {"base_treatment_power": 1, "treatment_accuracy": 0.9},
 }
+
 
 # ------------------------------------------------------------
 # FUNÇÕES DE DESENHO
@@ -100,7 +94,11 @@ def draw_profile_selection(screen, button_rects, font):
     title = font.render("Selecione seu perfil de jogador", True, WHITE)
     screen.blit(title, ((screen.get_width() - title.get_width()) // 2, 50))
     for rect, text in button_rects:
-        color = COLOR_PRIMARY if not rect.collidepoint(pygame.mouse.get_pos()) else COLOR_HIGHLIGHT
+        color = (
+            COLOR_PRIMARY
+            if not rect.collidepoint(pygame.mouse.get_pos())
+            else COLOR_HIGHLIGHT
+        )
         pygame.draw.rect(screen, color, rect, border_radius=8)
         label = font.render(text, True, WHITE)
         screen.blit(label, label.get_rect(center=rect.center))
@@ -194,7 +192,9 @@ def main():
                 pygame.draw.line(screen, (r, g, b), (0, i), (WIDTH, i))
 
             title_text = title_font.render("FIREWALL GAME", True, WHITE)
-            screen.blit(title_text, title_text.get_rect(center=(WIDTH // 2, HEIGHT // 6)))
+            screen.blit(
+                title_text, title_text.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+            )
 
             mx, my = pygame.mouse.get_pos()
             for rect, text in button_rects_menu:
