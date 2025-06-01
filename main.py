@@ -1,15 +1,13 @@
 import pygame
 import sys
 import os
-import random
-import time
 
 # ------------------------------------------------------------
 # CONSTANTES E CONFIGURAÇÕES GLOBAIS
 # ------------------------------------------------------------
 MENU = "menu"
-PLAYER_SELECT = "player_select"
 PLAYING = "playing"
+PLAYER_SELECT = "player_select"
 
 # ------------------------------------------------------------
 # CORES
