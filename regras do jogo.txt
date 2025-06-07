@@ -1,0 +1,58 @@
+Ataques: ransomware, phishing, DDoS e Spyware
+Centro de pesquisa em São Paulo
+Jogadores iniciam em São Paulo
+baralho para o jogador
+baralho de personagens
+baralho de infecção
+Marcador de velocidade de infecção
+Marcador de surtos
+Distribuir 2 cartas para 4 jogadores, 3 para 3 jogadores e 4 para 2 jogadores
+
+- jogador(es) seleciona(m) o personagem desejado
+
+ - Níveis de jogo:
+ -- fácil: 4 cartas de infecção
+ -- médio: 5
+ -- difícil: 6
+ -- Embaralhar no baralho de jogadores --
+- Selecionar o nível de dificuldade(pegar as cartas de epidemia de acordo com a dificuldade, dividir o baralho do jogador de acordo com o nível de dificuldade e embaralhar pra cada pedaço do baralho do jogador associado com cada carta de epidemia)
+
+
+- Ao iniciar o jogo, comprar 3 cartas de infecção
+colocar os 3 cubinhos da cor do ataque pra cada cidade.
+- comprar mais 3 cartas, só q agora colocando 2 cubinhos e descartar pós isso.
+- e por último, fazer o mesmo processo só que com 1 cubinho.
+
+
+
+
+Ficha de ações:
+4 ações de movimento
+ - Viajar de balsa ou carro: só pode viajar para as cidades conectadas. ir pra cada cidade é uma ação gasta.
+ - Voo direto: se eu tenho uma carta de uma cidade específica, eu viajo pra lá e descarto a carta
+ - Voo fretado: se eu estou numa cidade x e tenho uma carta dessa cidade, eu descarto essa carta e posso viajar pra qualquer lugar
+ - Fronte aérea: se tiver mais de 1 centro de pesquisa, eu posso sair de um e ir para o outro
+
+4 ações de efeito
+ - Contruir um centro de pesquisa: eu posso construir um, se eu tiver na cidade x e tiver a carta da cidade x. pós isso eu descarto.
+ -  Tratar um ataque: se tiver numa cidade com cubos de ataque, eu posso remover um cubo. se eu remover 2, eu gastei duas ações.
+ - compartilhar conhecimento: para compartilhar uma carta, é necessário q o os jogadores estejam na mesma cidade e um tenha a carta da cidade.
+ - descobrir a contramedida de um ataque: vc precisa ter 5 cartas do ataque x e estar em um centro de pesquisa.
+
+Forma de vencer:
+SÓ GANHA QUANDO DESCOBRIR UMA CONTRAMEDIDA PARA OS 4 ATAQUES
+
+Formas de perder:
+ - Se acontecer mais de 7 surtos. Se eu tenho uma cidade X e ela tem 3 cubinhos de ataque p. Se um jogador pegar uma carta de infecção da cidade X, o ataque se alastra pra todas as cidades que estão conectadas a ela. Desse modo, sobe um nível de surto(1). e assim por diante se tiver outro surto. Se a cidade x teve surto e o ataque se alastrou pra cidade y q tem 3 cubinhos, é mais um surto. ou seja, o ataque da cidade x vai se alastrar apenas para as cidade q tiverem no máximo 2 cubinhos e a cidade y vai ter um surto. logo vai se alastrar pra todas as cidades conectadas.
+ - Se eu n tiver mais cubinhos para colocar de um ataque x e ao comprar sair uma carta de infecção da carta x, fim de jogo.
+ - Acabar as cartas do baralho do jogador sem ter descoberto as 4 contramedidas.
+
+
+Quando se descobre uma contramedida, ao invés do jogador remover 1 cubinho por 1 ação, ele agora poderá remover todos os cubinhos daquela cidade com uma ação.
+
+
+Poder de cada personagem:
+1: consegue descobrir a contramedida com 4 cartas da mesmo ataque
+2: consegue remover todos os cubinhos de uma cidade com uma ação só
+3: consegue compartilhar qualquer carta desde que esteja na mesma cidade(mas a carta n precisa ser da mesma cidade)
+4: construir um centro de pesquisa sem precisar descartar a carta
