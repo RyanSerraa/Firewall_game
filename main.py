@@ -50,6 +50,15 @@ countries = {
     "Seul": (680, 160),
     "Buenos Aires": (320, 450),
     "Mumbai": (600, 250),
+    "Los Angeles": (150, 180),
+    "Cidade do México": (220, 300),
+    "Chicago": (170, 130),
+    "Madrid": (360, 140),
+    "Istambul": (500, 160),
+    "Bangkok": (650, 280),
+    "Xangai": (690, 200),
+    "Hong Kong": (670, 300),
+    "Jacarta": (700, 400),
 }
 
 # Inicialmente, todos os níveis de infecção são zero, apenas para colorir os marcadores
