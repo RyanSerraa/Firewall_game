@@ -6,11 +6,13 @@ from typing import Dict, Tuple, List
 
 # Imports dos módulos de domínio
 from domain.enums.tipoAtaque import TipoAtaque
+
 # from domain.enums.cor import Cor
 from domain.entities.cidade import Cidade
 from domain.entities.controladorEpidemia import ControladorEpidemia
 from domain.entities.controladorSurto import ControladorSurto
 from domain.entities.infeccao import Infeccao
+
 # from domain.entities.personagem import Personagem
 # from domain.entities.cuboAtaque import CuboAtaque
 
