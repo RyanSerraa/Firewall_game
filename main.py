@@ -1,29 +1,68 @@
 import pygame
 import sys
 import os
+import random
+from typing import Dict, Tuple, List
 
-# ------------------------------------------------------------
-# CONSTANTES E CONFIGURAÇÕES GLOBAIS
-# ------------------------------------------------------------
-MENU = "menu"
-PLAYING = "playing"
-PLAYER_SELECT = "player_select"
-
-# ------------------------------------------------------------
-# CORES
-# ------------------------------------------------------------
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-COLOR_BG_TOP = (30, 0, 60)
-COLOR_BG_BOTTOM = (90, 0, 150)
-COLOR_PRIMARY = (128, 0, 255)
-COLOR_HIGHLIGHT = (255, 0, 255)
+from domain.enums.tipoAtaque import TipoAtaque
+from domain.enums.cor import Cor
+from domain.entities.cidade import Cidade
+from domain.entities.controladorEpidemia import ControladorEpidemia
+from domain.entities.controladorSurto import ControladorSurto
+from domain.entities.infeccao import Infeccao
 
 
 # ------------------------------------------------------------
-# FUNÇÃO PARA CARREGAMENTO DE RECURSOS COM PyInstaller
+# CONSTANTES
 # ------------------------------------------------------------
-def resource_path(relative_path):
+class GameState:
+    MENU = "menu"
+    SELECT_COUNT = "select_count"
+    SELECT_PROFILE = "select_profile"
+    PLAYING = "playing"
+
+
+class Colors:
+    BLACK = (0, 0, 0)
+    WHITE = (255, 255, 255)
+    BG_TOP = (30, 0, 60)
+    BG_BOTTOM = (90, 0, 150)
+    PRIMARY = (128, 0, 255)
+    HIGHLIGHT = (255, 0, 255)
+
+
+CITY_DATA: Dict[str, Tuple[int, int, Cor]] = {
+    # 🟡 Amarelo (Sudeste)
+    "São Paulo": (220, 400, Cor.AMARELO),
+    "Bogotá": (90, 350, Cor.AMARELO),
+    "Lima": (240, 560, Cor.AMARELO),
+    "Buenos Aires": (100, 520, Cor.AMARELO),
+    "Santiago": (100, 200, Cor.AMARELO),
+    # 🔵 Azul (Noroeste)
+    "Nova York": (200, 120, Cor.AZUL),
+    "Toronto": (130, 90, Cor.AZUL),
+    "Washington": (210, 180, Cor.AZUL),
+    "Chicago": (150, 210, Cor.AZUL),
+    "Atlanta": (180, 250, Cor.AZUL),
+    # 🔴 Vermelho (Nordeste)
+    "Londres": (520, 80, Cor.VERMELHO),
+    "Paris": (580, 100, Cor.VERMELHO),
+    "Madri": (560, 160, Cor.VERMELHO),
+    "Berlim": (630, 90, Cor.VERMELHO),
+    "Roma": (600, 170, Cor.VERMELHO),
+    # ⚫ Preto (Centro-Leste)
+    "Cairo": (480, 300, Cor.PRETO),
+    "Istambul": (540, 340, Cor.PRETO),
+    "Moscou": (600, 270, Cor.PRETO),
+    "Bagdá": (530, 400, Cor.PRETO),
+    "Teerã": (600, 430, Cor.PRETO),
+}
+
+
+# ------------------------------------------------------------
+# UTILITÁRIOS
+# ------------------------------------------------------------
+def resource_path(relative_path: str) -> str:
     try:
         base_path = sys._MEIPASS
     except Exception:
@@ -32,199 +71,203 @@ def resource_path(relative_path):
 
 
 # ------------------------------------------------------------
-# DADOS DOS PAÍSES (COORDENADAS PARA DESENHO NO MAPA)
+# CONTROLADOR DO JOGO
 # ------------------------------------------------------------
-countries = {
-    "Nova York": (200, 150),
-    "Londres": (400, 120),
-    "Tóquio": (650, 180),
-    "São Paulo": (300, 400),
-    "Joanesburgo": (500, 450),
-    "Berlim": (420, 130),
-    "Moscou": (550, 100),
-    "Pequim": (700, 140),
-    "Sydney": (750, 500),
-    "Cairo": (480, 200),
-    "Toronto": (180, 100),
-    "Paris": (380, 110),
-    "Seul": (680, 160),
-    "Buenos Aires": (320, 450),
-    "Mumbai": (600, 250),
-    "Los Angeles": (150, 180),
-    "Cidade do México": (220, 300),
-    "Chicago": (170, 130),
-    "Madrid": (360, 140),
-    "Istambul": (500, 160),
-    "Bangkok": (650, 280),
-    "Xangai": (690, 200),
-    "Hong Kong": (670, 300),
-    "Jacarta": (700, 400),
-}
+class GameController:
+    def __init__(self, player_count: int) -> None:
+        self.player_count = player_count
+        self.ctrl_epidemia = ControladorEpidemia()
+        self.ctrl_surto = ControladorSurto()
+        self.cities: Dict[str, Cidade] = {}
+        self.infection_deck: List[Infeccao] = []
+        self._init_cities()
+        self._init_decks()
 
-# Inicialmente, todos os níveis de infecção são zero, apenas para colorir os marcadores
-infection_levels = {country: 0 for country in countries}
+    def _init_cities(self) -> None:
+        for name, (_, _, cor) in CITY_DATA.items():
+            self.cities[name] = Cidade(
+                nome=name,
+                pais="Desconhecido",
+                tipoAtaque=TipoAtaque.PHISHING,
+                cidadesVizinhas=[],
+                cubosAtaque=0,
+                cor=cor,
+            )
 
-# ------------------------------------------------------------
-# PERFIS DE JOGADOR (utilizados apenas para seleção, sem lógica posterior)
-# ------------------------------------------------------------
-player_profiles = {
-    "Analista": {"base_treatment_power": 2, "treatment_accuracy": 0.7},
-    "Especialista": {"base_treatment_power": 3, "treatment_accuracy": 0.5},
-    "Hacker Ético": {"base_treatment_power": 1, "treatment_accuracy": 0.9},
-}
+    def _init_decks(self) -> None:
+        self.infection_deck = [Infeccao(c) for c in self.cities.values()]
+        random.shuffle(self.infection_deck)
+        for cubes in [3, 2, 1]:
+            for _ in range(3):
+                if not self.infection_deck:
+                    return
+                card = self.infection_deck.pop(0)
+                card.acao((cubes, self.ctrl_surto))
 
 
 # ------------------------------------------------------------
 # FUNÇÕES DE DESENHO
 # ------------------------------------------------------------
-def draw_world_map(screen, mapa_img):
-    screen.blit(mapa_img, (0, 0))
+def draw_gradient_background(screen, width: int, height: int) -> None:
+    for i in range(height):
+        t = i / height
+        r = int(Colors.BG_TOP[0] * (1 - t) + Colors.BG_BOTTOM[0] * t)
+        g = int(Colors.BG_TOP[1] * (1 - t) + Colors.BG_BOTTOM[1] * t)
+        b = int(Colors.BG_TOP[2] * (1 - t) + Colors.BG_BOTTOM[2] * t)
+        pygame.draw.line(screen, (r, g, b), (0, i), (width, i))
 
 
-def draw_countries(screen, font):
-    for country, (x, y) in countries.items():
-        level = infection_levels[country]
-        if level == 0:
-            color = (0, 255, 0)
-        elif level <= 2:
-            color = (255, 255, 0)
-        elif level == 3:
-            color = (255, 165, 0)
-        else:
-            color = (200, 0, 0)
-        pygame.draw.circle(screen, color, (x, y), 15)
-        label = font.render(country, True, BLACK)
-        screen.blit(label, (x - label.get_width() // 2, y + 20))
+def draw_countries(screen, font, cities: Dict[str, Cidade]) -> None:
+    # Agrupar por cor
+    grouped_by_color: Dict[Cor, List[Tuple[int, int]]] = {}
 
+    for name, city in cities.items():
+        x, y = CITY_DATA.get(name, (0, 0, Cor.AMARELO))[:2]
+        grouped_by_color.setdefault(city.get_cor(), []).append((x, y))
 
-def draw_profile_selection(screen, button_rects, font):
-    title = font.render("Selecione seu perfil de jogador", True, WHITE)
-    screen.blit(title, ((screen.get_width() - title.get_width()) // 2, 50))
-    for rect, text in button_rects:
-        color = (
-            COLOR_PRIMARY
-            if not rect.collidepoint(pygame.mouse.get_pos())
-            else COLOR_HIGHLIGHT
-        )
-        pygame.draw.rect(screen, color, rect, border_radius=8)
-        label = font.render(text, True, WHITE)
-        screen.blit(label, label.get_rect(center=rect.center))
+        # Desenhar cidade
+        try:
+            color_rgb = pygame.Color(city.get_cor().value)
+        except (ValueError, pygame.error):
+            color_rgb = pygame.Color("#888888")
+
+        pygame.draw.circle(screen, color_rgb, (x, y), 10)
+        label = font.render(name, True, Colors.BLACK)
+        screen.blit(label, (x - label.get_width() // 2, y + 15))
+
+    # Desenhar conexões por cor
+    for cor, pontos in grouped_by_color.items():
+        try:
+            color_rgb = pygame.Color(cor.value)
+        except (ValueError, pygame.error):
+            color_rgb = pygame.Color("#888888")
+
+        for i in range(len(pontos)):
+            for j in range(i + 1, len(pontos)):
+                pygame.draw.line(screen, color_rgb, pontos[i], pontos[j], 2)
 
 
 # ------------------------------------------------------------
 # FUNÇÃO PRINCIPAL
 # ------------------------------------------------------------
 def main():
-    global game_state, selected_profile
-
     pygame.init()
     WIDTH, HEIGHT = 800, 600
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Firewall Game Simplificado")
+    pygame.display.set_caption("Firewall Game")
+    clock = pygame.time.Clock()
 
-    # Fontes
     title_font = pygame.font.Font(None, 72)
     font = pygame.font.Font(None, 48)
     small_font = pygame.font.Font(None, 32)
 
-    # Botões do menu principal
-    buttons_menu = ["Iniciar Jogo", "Sair"]
-    button_rects_menu = []
-    btn_w, btn_h = 300, 60
-    spacing = 20
-    total_h = len(buttons_menu) * btn_h + (len(buttons_menu) - 1) * spacing
-    start_y = (HEIGHT - total_h) // 2 + 50
-    for i, text in enumerate(buttons_menu):
-        x = (WIDTH - btn_w) // 2
-        y = start_y + i * (btn_h + spacing)
-        rect = pygame.Rect(x, y, btn_w, btn_h)
-        button_rects_menu.append((rect, text))
+    def create_rects(items: List[str], btn_w=300, btn_h=60, spacing=20):
+        total_h = len(items) * btn_h + (len(items) - 1) * spacing
+        start_y = (HEIGHT - total_h) // 2
+        return [
+            (
+                pygame.Rect(
+                    (WIDTH - btn_w) // 2, start_y + i * (btn_h + spacing), btn_w, btn_h
+                ),
+                item,
+            )
+            for i, item in enumerate(items)
+        ]
 
-    # Botões para seleção de perfil
-    buttons_profile = list(player_profiles.keys())
-    button_rects_profile = []
-    total_h2 = len(buttons_profile) * btn_h + (len(buttons_profile) - 1) * spacing
-    start_y2 = (HEIGHT - total_h2) // 2
-    for i, text in enumerate(buttons_profile):
-        x = (WIDTH - btn_w) // 2
-        y = start_y2 + i * (btn_h + spacing)
-        rect = pygame.Rect(x, y, btn_w, btn_h)
-        button_rects_profile.append((rect, text))
+    menu_rects = create_rects(["Iniciar Jogo", "Sair"])
+    count_rects = create_rects(["2 Jogadores", "3 Jogadores", "4 Jogadores"])
+    profile_rects = create_rects(["Analista", "Especialista", "Hacker Ético"])
 
-    # Imagem do mapa
-    mapa_path = resource_path("mapaMundi.png")
-    mapa_img = pygame.image.load(mapa_path)
-    mapa_img = pygame.transform.scale(mapa_img, (WIDTH, HEIGHT))
+    state = GameState.MENU
+    controller = None
+    player_count = 0
+    selected_profiles: List[str] = []
+    current_player = 1
 
-    clock = pygame.time.Clock()
-    running = True
-    game_state = MENU
-    selected_profile = None
-
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mx, my = event.pos
-
-                # --- MENU PRINCIPAL ---
-                if game_state == MENU:
-                    for rect, text in button_rects_menu:
+                if state == GameState.MENU:
+                    for rect, text in menu_rects:
                         if rect.collidepoint(mx, my):
-                            if text == "Sair":
-                                running = False
-                            elif text == "Iniciar Jogo":
-                                game_state = PLAYER_SELECT
-
-                # --- SELEÇÃO DE PERFIL ---
-                elif game_state == PLAYER_SELECT:
-                    for rect, profile_name in button_rects_profile:
+                            if text == "Iniciar Jogo":
+                                state = GameState.SELECT_COUNT
+                            elif text == "Sair":
+                                pygame.quit()
+                                sys.exit()
+                elif state == GameState.SELECT_COUNT:
+                    for rect, cnt in count_rects:
                         if rect.collidepoint(mx, my):
-                            selected_profile = profile_name
-                            # Ao selecionar perfil, transita para estado PLAYING
-                            game_state = PLAYING
+                            player_count = int(cnt.split()[0])
+                            state = GameState.SELECT_PROFILE
+                elif state == GameState.SELECT_PROFILE:
+                    for rect, p in profile_rects:
+                        if rect.collidepoint(mx, my):
+                            selected_profiles.append(p)
+                            if current_player < player_count:
+                                current_player += 1
+                            else:
+                                controller = GameController(player_count)
+                                state = GameState.PLAYING
+                            break
 
-        # --- DESENHO NA TELA ---
-        screen.fill((0, 0, 0))  # fundo PRETO para contraste
+        screen.fill(Colors.BLACK)
+        mx, my = pygame.mouse.get_pos()
 
-        if game_state == MENU:
-            # Gradiente de fundo
-            for i in range(HEIGHT):
-                t = i / HEIGHT
-                r = int(COLOR_BG_TOP[0] * (1 - t) + COLOR_BG_BOTTOM[0] * t)
-                g = int(COLOR_BG_TOP[1] * (1 - t) + COLOR_BG_BOTTOM[1] * t)
-                b = int(COLOR_BG_TOP[2] * (1 - t) + COLOR_BG_BOTTOM[2] * t)
-                pygame.draw.line(screen, (r, g, b), (0, i), (WIDTH, i))
+        if state == GameState.MENU:
+            draw_gradient_background(screen, WIDTH, HEIGHT)
+            title = title_font.render("FIREWALL GAME", True, Colors.WHITE)
+            screen.blit(title, title.get_rect(center=(WIDTH // 2, HEIGHT // 6)))
+            for rect, text in menu_rects:
+                hover = rect.collidepoint(mx, my)
+                color = Colors.HIGHLIGHT if hover else Colors.PRIMARY
+                pygame.draw.rect(screen, color, rect, border_radius=12)
+                pygame.draw.rect(screen, Colors.WHITE, rect, 3, border_radius=12)
+                surf = font.render(text, True, Colors.WHITE)
+                screen.blit(surf, surf.get_rect(center=rect.center))
 
-            title_text = title_font.render("FIREWALL GAME", True, WHITE)
-            screen.blit(
-                title_text, title_text.get_rect(center=(WIDTH // 2, HEIGHT // 6))
+        elif state == GameState.SELECT_COUNT:
+            screen.fill((20, 20, 40))
+            header = font.render("Selecione número de jogadores", True, Colors.WHITE)
+            screen.blit(header, header.get_rect(center=(WIDTH // 2, 80)))
+            for rect, cnt in count_rects:
+                hover = rect.collidepoint(mx, my)
+                color = Colors.HIGHLIGHT if hover else Colors.PRIMARY
+                pygame.draw.rect(screen, color, rect, border_radius=8)
+                surf = font.render(cnt, True, Colors.WHITE)
+                screen.blit(surf, surf.get_rect(center=rect.center))
+
+        elif state == GameState.SELECT_PROFILE:
+            screen.fill((40, 20, 20))
+            header = font.render(
+                f"Jogador {current_player}, escolha seu perfil", True, Colors.WHITE
+            )
+            screen.blit(header, header.get_rect(center=(WIDTH // 2, 80)))
+            for rect, p in profile_rects:
+                hover = rect.collidepoint(mx, my)
+                color = Colors.HIGHLIGHT if hover else Colors.PRIMARY
+                pygame.draw.rect(screen, color, rect, border_radius=8)
+                surf = font.render(p, True, Colors.WHITE)
+                screen.blit(surf, surf.get_rect(center=rect.center))
+
+        elif state == GameState.PLAYING and controller:
+            draw_gradient_background(screen, WIDTH, HEIGHT)
+            draw_countries(screen, small_font, controller.cities)
+            perfil_str = ", ".join(selected_profiles)
+            info = small_font.render(
+                f"Jogadores: {player_count} | Perfil(s): {perfil_str}",
+                True,
+                Colors.WHITE,
             )
 
-            mx, my = pygame.mouse.get_pos()
-            for rect, text in button_rects_menu:
-                color = COLOR_HIGHLIGHT if rect.collidepoint(mx, my) else COLOR_PRIMARY
-                pygame.draw.rect(screen, color, rect, border_radius=12)
-                pygame.draw.rect(screen, WHITE, rect, 3, border_radius=12)
-                txt_surf = font.render(text, True, WHITE)
-                screen.blit(txt_surf, txt_surf.get_rect(center=rect.center))
-
-        elif game_state == PLAYER_SELECT:
-            screen.fill((20, 20, 40))
-            draw_profile_selection(screen, button_rects_profile, font)
-
-        elif game_state == PLAYING:
-            # Desenha o mapa e as cidades sem interação
-            draw_world_map(screen, mapa_img)
-            draw_countries(screen, small_font)
+            screen.blit(info, (20, 20))
 
         pygame.display.flip()
         clock.tick(60)
-
-    pygame.quit()
-    sys.exit()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 from typing import Any
 
-from carta import Carta
+from domain.entities.carta import Carta
 
 
 class Personagem(Carta):

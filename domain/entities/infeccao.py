@@ -1,6 +1,6 @@
-from cidade import Cidade
-from carta import Carta
-from controladorSurto import ControladorSurto
+from domain.entities.cidade import Cidade
+from domain.entities.controladorSurto import ControladorSurto
+from domain.entities.carta import Carta
 
 
 class Infeccao(Carta):
