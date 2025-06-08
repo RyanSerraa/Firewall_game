@@ -52,7 +52,7 @@ Quando se descobre uma contramedida, ao invés do jogador remover 1 cubinho por 
 
 
 Poder de cada personagem:
-1: consegue descobrir a contramedida com 4 cartas da mesmo ataque
+1: consegue descobrir a contramedida com 3 cartas da mesmo ataque
 2: consegue remover todos os cubinhos de uma cidade com uma ação só
 3: consegue compartilhar qualquer carta desde que esteja na mesma cidade(mas a carta n precisa ser da mesma cidade)
 4: construir um centro de pesquisa sem precisar descartar a carta

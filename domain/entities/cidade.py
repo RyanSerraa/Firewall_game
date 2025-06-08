@@ -52,12 +52,16 @@ class Cidade:
         self.__cidadesVizinhas = vizinhas
 
     def set_cubosAtaque(self, cubosAtaque: int) -> None:
-        self.__cubosAtaque = cubosAtaque
+        self.__cubosAtaque += cubosAtaque
 
     def set_cor(self, cor: Cor) -> None:
         self.__cor = cor
 
     # Verificação de surto
     def verificarSurto(self, qtd: int) -> bool:
-        """Retorna True se a soma dos cubos atuais + qtd ultrapassar 3."""
         return self.__cubosAtaque + qtd > 3
+
+    def surto(self) -> None:
+        for cidade in self.__cidadesVizinhas:
+            if not cidade.verificarSurto(1):
+                cidade.set_cubosAtaque(1)
