@@ -1,6 +1,7 @@
-from domain.entities.cidade           import Cidade
+from domain.entities.cidade import Cidade
 from domain.entities.controladorSurto import ControladorSurto
-from domain.entities.carta            import Carta
+from domain.entities.carta import Carta
+
 
 class Infeccao(Carta):
     def __init__(self, cidade: Cidade) -> None:
