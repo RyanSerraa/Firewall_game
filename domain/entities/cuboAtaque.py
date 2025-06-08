@@ -4,6 +4,11 @@ from domain.enums.tipoAtaque import TipoAtaque
 
 class CuboAtaque:
     def __init__(self, ataque: TipoAtaque, cor: Cor) -> None:
+        if not isinstance(ataque, TipoAtaque):
+            raise TypeError(f"Esperado TipoAtaque, recebido {type(ataque)}")
+        if not isinstance(cor, Cor):
+            raise TypeError(f"Esperado Cor, recebido {type(cor)}")
+
         self.__ataque = ataque
         self.__cor = cor
 
