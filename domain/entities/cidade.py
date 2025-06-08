@@ -1,4 +1,4 @@
-from enums.tipoAtaque import TipoAtaque
+from domain.enums.tipoAtaque import TipoAtaque
 
 
 class Cidade:

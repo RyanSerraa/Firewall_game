@@ -1,5 +1,5 @@
-from enums.tipoAtaque import TipoAtaque
-from enums.cor import Cor
+from domain.enums.cor import Cor
+from domain.enums.tipoAtaque import TipoAtaque
 
 
 class CuboAtaque:
