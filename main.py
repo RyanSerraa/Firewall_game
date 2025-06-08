@@ -262,10 +262,14 @@ def main():
             draw_gradient_background(screen, WIDTH, HEIGHT)
             draw_countries(screen, small_font, controller.cities)
             info = small_font.render(
-                f'Jogadores: {player_count} | Perfil(s): {", ".join(selected_profiles)}',
+                "Jogadores: "
+                + str(player_count)
+                + " | Perfil(s): "
+                + ", ".join(selected_profiles),
                 True,
                 WHITE,
             )
+
             screen.blit(info, (20, 20))
         pygame.display.flip()
         clock.tick(60)
