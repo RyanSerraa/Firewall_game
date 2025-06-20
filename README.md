@@ -35,7 +35,9 @@ https://graphite.dev/guides/closing-issues-with-pull-requests-in-github
         * git checkout -b {DEV-numero da branch} -> ese numero da branch é sequiencial então se a ultima foi 005 a sua será 006
         * git add .
         * git commit -m "DEV-005  Texto do que foi feito - fix #código da issue"
+        * git push origin DEV-NUMERO DA SUA BRANCH
         * git checkout main 
+        
 
     4° Esse fix basicamente é uma keyord para fechar a issue 
 
