@@ -1,6 +1,5 @@
 import pygame
 import sys
-import os
 import random
 from typing import Dict, Tuple, List
 
@@ -32,25 +31,21 @@ class Colors:
 
 
 CITY_DATA: Dict[str, Tuple[int, int, Cor]] = {
-    # 🟡 Amarelo (Sudeste)
     "São Paulo": (220, 400, Cor.AMARELO),
     "Bogotá": (90, 350, Cor.AMARELO),
     "Lima": (240, 560, Cor.AMARELO),
     "Buenos Aires": (100, 520, Cor.AMARELO),
     "Santiago": (100, 200, Cor.AMARELO),
-    # 🔵 Azul (Noroeste)
     "Nova York": (200, 120, Cor.AZUL),
     "Toronto": (130, 90, Cor.AZUL),
     "Washington": (210, 180, Cor.AZUL),
     "Chicago": (150, 210, Cor.AZUL),
     "Atlanta": (180, 250, Cor.AZUL),
-    # 🔴 Vermelho (Nordeste)
     "Londres": (520, 80, Cor.VERMELHO),
     "Paris": (580, 100, Cor.VERMELHO),
     "Madri": (560, 160, Cor.VERMELHO),
     "Berlim": (630, 90, Cor.VERMELHO),
     "Roma": (600, 170, Cor.VERMELHO),
-    # ⚫ Preto (Centro-Leste)
     "Cairo": (480, 300, Cor.PRETO),
     "Istambul": (540, 340, Cor.PRETO),
     "Moscou": (600, 270, Cor.PRETO),
@@ -60,19 +55,21 @@ CITY_DATA: Dict[str, Tuple[int, int, Cor]] = {
 
 
 # ------------------------------------------------------------
-# UTILITÁRIOS
+# CLASSES
 # ------------------------------------------------------------
-def resource_path(relative_path: str) -> str:
-    try:
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+class Jogador:
+    def __init__(self, nome: str, perfil: str, cidade: Cidade):
+        self.nome = nome
+        self.perfil = perfil
+        self.cidade_atual = cidade
+        self.acoes_restantes = 4
+
+    def mover_para(self, nova_cidade: Cidade):
+        if self.acoes_restantes > 0:
+            self.cidade_atual = nova_cidade
+            self.acoes_restantes -= 1
 
 
-# ------------------------------------------------------------
-# CONTROLADOR DO JOGO
-# ------------------------------------------------------------
 class GameController:
     def __init__(self, player_count: int) -> None:
         self.player_count = player_count
@@ -118,30 +115,23 @@ def draw_gradient_background(screen, width: int, height: int) -> None:
 
 
 def draw_countries(screen, font, cities: Dict[str, Cidade]) -> None:
-    # Agrupar por cor
     grouped_by_color: Dict[Cor, List[Tuple[int, int]]] = {}
-
     for name, city in cities.items():
         x, y = CITY_DATA.get(name, (0, 0, Cor.AMARELO))[:2]
         grouped_by_color.setdefault(city.get_cor(), []).append((x, y))
-
-        # Desenhar cidade
         try:
             color_rgb = pygame.Color(city.get_cor().value)
         except (ValueError, pygame.error):
             color_rgb = pygame.Color("#888888")
-
         pygame.draw.circle(screen, color_rgb, (x, y), 10)
         label = font.render(name, True, Colors.BLACK)
         screen.blit(label, (x - label.get_width() // 2, y + 15))
 
-    # Desenhar conexões por cor
     for cor, pontos in grouped_by_color.items():
         try:
             color_rgb = pygame.Color(cor.value)
         except (ValueError, pygame.error):
             color_rgb = pygame.Color("#888888")
-
         for i in range(len(pontos)):
             for j in range(i + 1, len(pontos)):
                 pygame.draw.line(screen, color_rgb, pontos[i], pontos[j], 2)
@@ -183,12 +173,15 @@ def main():
     player_count = 0
     selected_profiles: List[str] = []
     current_player = 1
+    jogadores: List[Jogador] = []
+    jogador_atual_idx = 0
 
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mx, my = event.pos
                 if state == GameState.MENU:
@@ -199,11 +192,13 @@ def main():
                             elif text == "Sair":
                                 pygame.quit()
                                 sys.exit()
+
                 elif state == GameState.SELECT_COUNT:
                     for rect, cnt in count_rects:
                         if rect.collidepoint(mx, my):
                             player_count = int(cnt.split()[0])
                             state = GameState.SELECT_PROFILE
+
                 elif state == GameState.SELECT_PROFILE:
                     for rect, p in profile_rects:
                         if rect.collidepoint(mx, my):
@@ -212,8 +207,29 @@ def main():
                                 current_player += 1
                             else:
                                 controller = GameController(player_count)
+                                jogadores = []
+                                for i in range(player_count):
+                                    jogador = Jogador(
+                                        f"Jogador {i+1}",
+                                        selected_profiles[i],
+                                        controller.cities["São Paulo"],
+                                    )
+                                    jogadores.append(jogador)
+                                jogador_atual_idx = 0
                                 state = GameState.PLAYING
                             break
+
+                elif state == GameState.PLAYING:
+                    jogador_atual = jogadores[jogador_atual_idx]
+                    for nome, (x, y, _) in CITY_DATA.items():
+                        cidade = controller.cities[nome]
+                        if (mx - x) ** 2 + (my - y) ** 2 <= 10**2:
+                            jogador_atual.mover_para(cidade)
+                            break
+
+                    if jogador_atual.acoes_restantes == 0:
+                        jogador_atual_idx = (jogador_atual_idx + 1) % player_count
+                        jogadores[jogador_atual_idx].acoes_restantes = 4
 
         screen.fill(Colors.BLACK)
         mx, my = pygame.mouse.get_pos()
@@ -258,13 +274,36 @@ def main():
             draw_gradient_background(screen, WIDTH, HEIGHT)
             draw_countries(screen, small_font, controller.cities)
             perfil_str = ", ".join(selected_profiles)
-            info = small_font.render(
-                f"Jogadores: {player_count} | Perfil(s): {perfil_str}",
+            screen.blit(
+                small_font.render(
+                    f"Jogadores: {player_count} | Perfil(s): {perfil_str}",
+                    True,
+                    Colors.WHITE,
+                ),
+                (20, 20),
+            )
+
+            # Mostrar jogadores no mapa
+            for j, jogador in enumerate(jogadores):
+                x, y = CITY_DATA[jogador.cidade_atual.get_nome()][:2]
+                cor_jogador = [
+                    (255, 255, 0),
+                    (0, 255, 0),
+                    (0, 255, 255),
+                    (255, 128, 0),
+                ][j]
+                pygame.draw.circle(screen, cor_jogador, (x, y), 6)
+                label = small_font.render(f"P{j+1}", True, Colors.BLACK)
+                screen.blit(label, (x - 10, y - 25))
+
+            jogador_atual = jogadores[jogador_atual_idx]
+            info_turno = small_font.render(
+                f"Vez de {jogador_atual.nome} \
+                | Ações restantes: {jogador_atual.acoes_restantes}",
                 True,
                 Colors.WHITE,
             )
-
-            screen.blit(info, (20, 20))
+            screen.blit(info_turno, (20, 50))
 
         pygame.display.flip()
         clock.tick(60)
