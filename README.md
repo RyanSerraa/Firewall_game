@@ -49,3 +49,23 @@ https://graphite.dev/guides/closing-issues-with-pull-requests-in-github
     5°colocar a label corresponde com essa issue.
     6°Clicar em "Create"
 
+### Comandos git que podem te auxiliar
+    * git checkout -b nome-da-branch (cria uma nova branch)
+    * git commit -m "mensagem" – Cria um commit com a mensagem fornecida
+    * git commit --amend – Permite editar o último commit (útil para corrigir mensagem ou adicionar arquivos esquecidos).
+    * git reset --soft HEAD~1 – Remove o último commit mas mantém as alterações no staging.
+    * git reset --hard HEAD~1 – Apaga o último commit e perde as alterações.
+    * git restore arquivo.txt – Desfaz alterações locais em um arquivo.
+    * git checkout nome-da-branch (Altera para a branch requerida)
+    * git pull origin nome-da-branch (puxa as alterações da branch referenciada)
+    * git push origin nome-da-branch
+    * git branch -m novo-nome-da-branch (Altera o nome da branch atual)
+    * git branch -D nome-da-branch (Deleta a branch)
+    * git commit --allow-empty -m "Sua mensagem" (Só use se esquecer de relacionar sua branch com a issue)
+    * git pull --rebase master (Força um rebase entre a sua branch com a master) 
+    * git stash (Coloca suas alterações em staging)
+    * git stah pop (retorna suas alterações para sua area de trabalho)
+    * git diff – Mostra as alterações feitas antes de um commit.
+    * git branch – Lista todas as branches locais.
+    * git branch -r – Lista branches remotas.
+    * git log – Mostra o histórico de commits.
