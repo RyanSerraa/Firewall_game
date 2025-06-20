@@ -1,6 +1,5 @@
 import pygame
 import sys
-import os
 import random
 from typing import Dict, Tuple, List
 
@@ -11,6 +10,7 @@ from domain.entities.controladorEpidemia import ControladorEpidemia
 from domain.entities.controladorSurto import ControladorSurto
 from domain.entities.infeccao import Infeccao
 
+
 # ------------------------------------------------------------
 # CONSTANTES
 # ------------------------------------------------------------
@@ -20,6 +20,7 @@ class GameState:
     SELECT_PROFILE = "select_profile"
     PLAYING = "playing"
 
+
 class Colors:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -27,6 +28,7 @@ class Colors:
     BG_BOTTOM = (90, 0, 150)
     PRIMARY = (128, 0, 255)
     HIGHLIGHT = (255, 0, 255)
+
 
 CITY_DATA: Dict[str, Tuple[int, int, Cor]] = {
     "São Paulo": (220, 400, Cor.AMARELO),
@@ -51,6 +53,7 @@ CITY_DATA: Dict[str, Tuple[int, int, Cor]] = {
     "Teerã": (600, 430, Cor.PRETO),
 }
 
+
 # ------------------------------------------------------------
 # CLASSES
 # ------------------------------------------------------------
@@ -65,6 +68,7 @@ class Jogador:
         if self.acoes_restantes > 0:
             self.cidade_atual = nova_cidade
             self.acoes_restantes -= 1
+
 
 class GameController:
     def __init__(self, player_count: int) -> None:
@@ -97,6 +101,7 @@ class GameController:
                 card = self.infection_deck.pop(0)
                 card.acao((cubes, self.ctrl_surto))
 
+
 # ------------------------------------------------------------
 # FUNÇÕES DE DESENHO
 # ------------------------------------------------------------
@@ -107,6 +112,7 @@ def draw_gradient_background(screen, width: int, height: int) -> None:
         g = int(Colors.BG_TOP[1] * (1 - t) + Colors.BG_BOTTOM[1] * t)
         b = int(Colors.BG_TOP[2] * (1 - t) + Colors.BG_BOTTOM[2] * t)
         pygame.draw.line(screen, (r, g, b), (0, i), (width, i))
+
 
 def draw_countries(screen, font, cities: Dict[str, Cidade]) -> None:
     grouped_by_color: Dict[Cor, List[Tuple[int, int]]] = {}
@@ -129,6 +135,7 @@ def draw_countries(screen, font, cities: Dict[str, Cidade]) -> None:
         for i in range(len(pontos)):
             for j in range(i + 1, len(pontos)):
                 pygame.draw.line(screen, color_rgb, pontos[i], pontos[j], 2)
+
 
 # ------------------------------------------------------------
 # FUNÇÃO PRINCIPAL
@@ -205,7 +212,7 @@ def main():
                                     jogador = Jogador(
                                         f"Jogador {i+1}",
                                         selected_profiles[i],
-                                        controller.cities["São Paulo"]
+                                        controller.cities["São Paulo"],
                                     )
                                     jogadores.append(jogador)
                                 jogador_atual_idx = 0
@@ -279,20 +286,28 @@ def main():
             # Mostrar jogadores no mapa
             for j, jogador in enumerate(jogadores):
                 x, y = CITY_DATA[jogador.cidade_atual.get_nome()][:2]
-                cor_jogador = [(255, 255, 0), (0, 255, 0), (0, 255, 255), (255, 128, 0)][j]
+                cor_jogador = [
+                    (255, 255, 0),
+                    (0, 255, 0),
+                    (0, 255, 255),
+                    (255, 128, 0),
+                ][j]
                 pygame.draw.circle(screen, cor_jogador, (x, y), 6)
                 label = small_font.render(f"P{j+1}", True, Colors.BLACK)
                 screen.blit(label, (x - 10, y - 25))
 
             jogador_atual = jogadores[jogador_atual_idx]
             info_turno = small_font.render(
-                f"Vez de {jogador_atual.nome} | Ações restantes: {jogador_atual.acoes_restantes}",
-                True, Colors.WHITE
+                f"Vez de {jogador_atual.nome} \
+                | Ações restantes: {jogador_atual.acoes_restantes}",
+                True,
+                Colors.WHITE,
             )
             screen.blit(info_turno, (20, 50))
 
         pygame.display.flip()
         clock.tick(60)
+
 
 if __name__ == "__main__":
     main()
