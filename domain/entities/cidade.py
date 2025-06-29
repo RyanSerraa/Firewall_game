@@ -66,5 +66,5 @@ class Cidade:
 
     def surto(self, qtd: CuboAtaque) -> None:
         for cidade in self.__cidadesVizinhas:
-            if cidade.verificarSurto(qtd):
+            if not cidade.verificarSurto(qtd):
                 cidade.set_cubosAtaque(qtd)
