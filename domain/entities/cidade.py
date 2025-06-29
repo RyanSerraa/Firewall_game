@@ -1,5 +1,6 @@
 from domain.enums.tipoAtaque import TipoAtaque
 from domain.enums.cor import Cor
+from domain.entities.cuboAtaque import CuboAtaque
 
 
 class Cidade:
@@ -9,7 +10,7 @@ class Cidade:
         pais: str,
         tipoAtaque: TipoAtaque,
         cidadesVizinhas: list["Cidade"],
-        cubosAtaque: int,
+        cubosAtaque: list[CuboAtaque],
         cor: Cor,
     ) -> None:
         self.__nome = nome
@@ -32,7 +33,7 @@ class Cidade:
     def get_cidadesVizinhas(self) -> list["Cidade"]:
         return self.__cidadesVizinhas
 
-    def get_cubosAtaque(self) -> int:
+    def get_cubosAtaque(self) -> list[CuboAtaque]:
         return self.__cubosAtaque
 
     def get_cor(self) -> Cor:
@@ -51,17 +52,19 @@ class Cidade:
     def set_cidadesVizinhas(self, vizinhas: list["Cidade"]) -> None:
         self.__cidadesVizinhas = vizinhas
 
-    def set_cubosAtaque(self, cubosAtaque: int) -> None:
-        self.__cubosAtaque += cubosAtaque
+    def set_cubosAtaque(self, cubosAtaque: CuboAtaque) -> None:
+        self.__cubosAtaque.append(cubosAtaque)
 
     def set_cor(self, cor: Cor) -> None:
         self.__cor = cor
 
     # Verificação de surto
-    def verificarSurto(self, qtd: int) -> bool:
-        return self.__cubosAtaque + qtd > 3
+    def verificarSurto(self, cubo: CuboAtaque) -> bool:
+        copia = self.__cubosAtaque.copy()
+        copia.append(cubo)
+        return len(copia) > 3
 
-    def surto(self) -> None:
+    def surto(self, qtd: CuboAtaque) -> None:
         for cidade in self.__cidadesVizinhas:
-            if not cidade.verificarSurto(1):
-                cidade.set_cubosAtaque(1)
+            if cidade.verificarSurto(qtd):
+                cidade.set_cubosAtaque(qtd)
