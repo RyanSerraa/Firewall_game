@@ -2,7 +2,7 @@
 
 ## Configuração
 
-- Criar ambiente virtual no windonws: python -m venv .venv
+- Criar ambiente virtual no windows: python -m venv .venv
 - Criar ambiente virtual no linux: python3 -m venv .venv
 
 - Ativar no windowns: .venv\Scripts\activate
